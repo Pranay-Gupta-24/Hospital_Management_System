@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patients</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+    <a href="index.html">Home</a> |
+    <a href="dashboard.html">Dashboard</a> |
+    <a href="doctors.html">Doctors</a> |
+    <a href="patients.html">Patients</a> |
+    <a href="appointments.html">Appointments</a>
+</nav>
+<hr>
+<h2>Add Patient</h2>
+
+<input type="text" id="name" placeholder="Name">
+<input type="number" id="age" placeholder="Age">
+<input type="text" id="disease" placeholder="Disease">
+<input type="text" id="contact" placeholder="Contact">
+
+<button onclick="addPatient()">Add Patient</button>
+
+<h2>Patient List</h2>
+<table id="patientTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Disease</th>
+            <th>Contact</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+function addPatient() {
+    let url = "http://127.0.0.1:5000/patients";
+    let method = "POST";
+
+    if (window.currentEditId) {
+        url += "/" + window.currentEditId;
+        method = "PUT";
+    }
+
+    fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: document.getElementById("name").value,
+            age: document.getElementById("age").value,
+            disease: document.getElementById("disease").value,
+            contact: document.getElementById("contact").value
+        })
+    })
+    .then(() => {
+        window.currentEditId = null;
+        loadPatients();
+    });
+}
+
+function loadPatients() {
+    fetch("http://127.0.0.1:5000/patients")
+    .then(res => res.json())
+    .then(data => {
+        let table = document.querySelector("#patientTable tbody");
+        table.innerHTML = "";
+
+        data.forEach(p => {
+            let row = `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>${p.age}</td>
+                    <td>${p.disease}</td>
+                    <td>${p.contact}</td>
+                    <td>
+                        <button onclick="editPatient(${p.id}, '${p.name}', ${p.age}, '${p.disease}', '${p.contact}')">Edit</button>
+                        <button onclick="deletePatient(${p.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    });
+}
+
+function editPatient(id, name, age, disease, contact) {
+    document.getElementById("name").value = name;
+    document.getElementById("age").value = age;
+    document.getElementById("disease").value = disease;
+    document.getElementById("contact").value = contact;
+
+    window.currentEditId = id;
+}
+
+function deletePatient(id) {
+    fetch(`http://127.0.0.1:5000/patients/${id}`, {
+        method: "DELETE"
+    })
+    .then(() => loadPatients());
+}
+
+loadPatients();
+</script>
+
+</body>
+</html>

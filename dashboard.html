@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="doctors.html">Doctors</a>
+    <a href="patients.html">Patients</a>
+    <a href="appointments.html">Appointments</a>
+</nav>
+
+<div class="container">
+    <h1>Hospital Dashboard</h1>
+
+    <div class="cards">
+        <div class="card">Doctors: <span id="docCount"></span></div>
+        <div class="card">Patients: <span id="patCount"></span></div>
+        <div class="card">Appointments: <span id="appCount"></span></div>
+    </div>
+</div>
+
+<script>
+function loadDashboard() {
+    fetch("http://127.0.0.1:5000/dashboard")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("docCount").innerText = data.doctors;
+        document.getElementById("patCount").innerText = data.patients;
+        document.getElementById("appCount").innerText = data.appointments;
+    });
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
