@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointments</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav>
+    <a href="index.html">Home</a> |
+    <a href="dashboard.html">Dashboard</a> |
+    <a href="doctors.html">Doctors</a> |
+    <a href="patients.html">Patients</a> |
+    <a href="appointments.html">Appointments</a>
+</nav>
+<hr>
+<h2>Book Appointment</h2>
+
+<select id="patient"></select>
+<select id="doctor"></select>
+<input type="date" id="date">
+<input type="time" id="time">
+
+<button onclick="addAppointment()">Book</button>
+
+<h2>Appointments List</h2>
+<table id="appointmentTable">
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+function loadPatientsDropdown() {
+    fetch("http://127.0.0.1:5000/patients")
+    .then(res => res.json())
+    .then(data => {
+        let select = document.getElementById("patient");
+        select.innerHTML = "";
+
+        data.forEach(p => {
+            let option = document.createElement("option");
+            option.value = p.id;
+            option.text = p.name;
+            select.appendChild(option);
+        });
+    });
+}
+
+function loadDoctorsDropdown() {
+    fetch("http://127.0.0.1:5000/doctors")
+    .then(res => res.json())
+    .then(data => {
+        let select = document.getElementById("doctor");
+        select.innerHTML = "";
+
+        data.forEach(d => {
+            let option = document.createElement("option");
+            option.value = d.id;
+            option.text = d.name;
+            select.appendChild(option);
+        });
+    });
+}
+function addAppointment() {
+    let url = "http://127.0.0.1:5000/appointments";
+    let method = "POST";
+
+    if (window.currentEditId) {
+        url += "/" + window.currentEditId;
+        method = "PUT";
+    }
+
+    fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            patient_id: document.getElementById("patient").value,
+            doctor_id: document.getElementById("doctor").value,
+            date: document.getElementById("date").value,
+            time: document.getElementById("time").value
+        })
+    })
+    .then(() => {
+        window.currentEditId = null;
+        loadAppointments();
+    });
+}
+
+function loadAppointments() {
+    fetch("http://127.0.0.1:5000/appointments")
+    .then(res => res.json())
+    .then(data => {
+        let table = document.querySelector("#appointmentTable tbody");
+        table.innerHTML = "";
+
+        data.forEach(a => {
+            let row = `
+                <tr>
+                    <td>${a.patient}</td>
+                    <td>${a.doctor}</td>
+                    <td>${a.date}</td>
+                    <td>${a.time}</td>
+                    <td>
+                      <button onclick="editAppointment(${a.id}, '${a.date}', '${a.time}')">Edit</button>
+                      <button onclick="deleteAppointment(${a.id})">Delete</button>
+                    </td>                  
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    });
+}
+function editAppointment(id, date, time) {
+    document.getElementById("date").value = date;
+    document.getElementById("time").value = time;
+
+    window.currentEditId = id;
+}
+
+function deleteAppointment(id) {
+    fetch(`http://127.0.0.1:5000/appointments/${id}`, {
+        method: "DELETE"
+    })
+    .then(() => loadAppointments());
+}
+
+loadAppointments();
+loadPatientsDropdown();
+loadDoctorsDropdown();
+</script>
+
+</body>
+</html>

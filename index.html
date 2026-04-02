@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital System</title>
+</head>
+<body>
+<nav>
+    <a href="index.html">Home</a> |
+    <a href="dashboard.html">Dashboard</a> |
+    <a href="doctors.html">Doctors</a> |
+    <a href="patients.html">Patients</a> |
+    <a href="appointments.html">Appointments</a>
+</nav>
+<hr>
+<h1>Hospital Management System</h1>
+<button onclick="loadBackend()">Check Backend</button>
+
+<p id="output"></p>
+
+<script>
+function loadBackend() {
+    fetch("http://127.0.0.1:5000/")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("output").innerText = data.message;
+    })
+    .catch(err => console.log(err));
+}
+</script>
+
+</body>
+</html>
