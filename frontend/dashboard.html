@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="navbar">
+    <a href="dashboard.html" class="active">🏠 Dashboard</a>
+    <a href="doctors.html">👨‍⚕️ Doctors</a>
+    <a href="patients.html">🧑‍🤝‍🧑 Patients</a>
+    <a href="appointments.html">📅 Appointments</a>
+</div>
+
+<div class="container">
+    <h1>Hospital Dashboard</h1>
+
+    <div class="cards">
+        <div class="card">Doctors: <span id="docCount"></span></div>
+        <div class="card">Patients: <span id="patCount"></span></div>
+        <div class="card">Appointments: <span id="appCount"></span></div>
+        <div class="card">
+    <h3>Wards:</h3>
+    <span id="wardCount">0</span>
+</div>
+    </div>
+</div>
+<h2>Recent Appointments</h2>
+
+<table id="recentTable">
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<script>
+function loadDashboard() {
+    fetch("http://127.0.0.1:5000/dashboard")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("docCount").innerText = data.doctors;
+        document.getElementById("patCount").innerText = data.patients;
+        document.getElementById("appCount").innerText = data.appointments;
+        document.getElementById("wardCount").innerText = data.wards;
+
+        let table = document.querySelector("#recentTable tbody");
+        table.innerHTML = "";
+
+        data.recent.forEach(r => {
+            let row = `
+                <tr>
+                    <td>${r.patient}</td>
+                    <td>${r.doctor}</td>
+                    <td>${r.date}</td>
+                    <td>${r.time}</td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    });
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

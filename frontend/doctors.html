@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Doctors</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="navbar">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="doctors.html" class="active">👨‍⚕️ Doctors</a>
+    <a href="patients.html">🧑‍🤝‍🧑 Patients</a>
+    <a href="appointments.html">📅 Appointments</a>
+</div>
+<hr>
+<h2>Add Doctor</h2>
+
+<div class="top-bar">
+    
+    <div class="form-section">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="specialization" placeholder="Specialization">
+        <input type="number" id="fees" placeholder="Fees">
+        <button onclick="addDoctor()">Add Doctor</button>
+    </div>
+
+    <div class="search-section">
+    
+    <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" id="search" placeholder="Search doctor..." onkeyup="searchDoctor()">
+    </div>
+
+    <select id="filter" onchange="filterDoctor()">
+        <option value="">All Specializations</option>
+        <option value="Cardiologist">Cardiologist</option>
+        <option value="General Physician">General Physician</option>
+    </select>
+
+     </div>
+</div>
+<h2>Doctor List</h2>
+<table border="1" id="doctorTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Specialization</th>
+            <th>Fees</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+function addDoctor() {
+    let url = "http://127.0.0.1:5000/doctors";
+    let method = "POST";
+
+    if (window.currentEditId) {
+        url += "/" + window.currentEditId;
+        method = "PUT";
+    }
+    fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: document.getElementById("name").value,
+            specialization: document.getElementById("specialization").value,
+            fees: document.getElementById("fees").value
+        })
+    })
+    .then(() => {
+        window.currentEditId = null;
+        loadDoctors();
+    });
+}
+
+function loadDoctors() {
+    fetch("http://127.0.0.1:5000/doctors")
+    .then(res => res.json())
+    .then(data => {
+        let table = document.querySelector("#doctorTable tbody");
+        table.innerHTML = "";
+
+        data.forEach(doc => {
+            let row = `
+                <tr>
+                    <td>${doc.name}</td>
+                    <td>${doc.specialization}</td>
+                    <td>₹${doc.fees}</td>
+                    <td>
+                        <button onclick="editDoctor(${doc.id}, '${doc.name}', '${doc.specialization}', ${doc.fees})">Edit</button>
+                        <button onclick="deleteDoctor(${doc.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    });
+}
+
+function editDoctor(id, name, specialization, fees) {
+    document.getElementById("name").value = name;
+    document.getElementById("specialization").value = specialization;
+    document.getElementById("fees").value = fees;
+
+    window.currentEditId = id;
+}
+
+function deleteDoctor(id) {
+    fetch(`http://127.0.0.1:5000/doctors/${id}`, {
+        method: "DELETE"
+    })
+    .then(() => loadDoctors());
+}
+function searchDoctor() {
+    let searchValue = document.getElementById("search").value.toLowerCase();
+    let filterValue = document.getElementById("filter").value.toLowerCase();
+
+    let rows = document.querySelectorAll("#doctorTable tbody tr");
+
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+
+        let matchesSearch = text.includes(searchValue);
+        let matchesFilter = filterValue === "" || text.includes(filterValue);
+
+        row.style.display = (matchesSearch && matchesFilter) ? "" : "none";
+    });
+}
+function filterDoctor() {
+    searchDoctor(); // reuse same logic
+}
+
+// Load on start
+loadDoctors();
+</script>
+
+</body>
+</html>

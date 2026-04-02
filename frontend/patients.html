@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patients</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="navbar">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="doctors.html">👨‍⚕️ Doctors</a>
+    <a href="patients.html" class="active">🧑‍🤝‍🧑 Patients</a>
+    <a href="appointments.html">📅 Appointments</a>
+</div>
+<hr>
+<h2>Add Patient</h2>
+
+<div class="top-bar">
+
+    <div class="form-section">
+        <input type="text" id="name" placeholder="Name">
+        <input type="number" id="age" placeholder="Age">
+        <input type="text" id="disease" placeholder="Disease">
+        <input type="text" id="contact" placeholder="Contact">
+        <button onclick="addPatient()">Add Patient</button>
+    </div>
+
+    <div class="search-section">
+
+    <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" id="searchPatient" placeholder="Search patient..." onkeyup="applyPatientFilters()">
+    </div>
+
+    <select id="filterDisease" onchange="applyPatientFilters()">
+        <option value="">All Diseases</option>
+        <option value="Heart Problem">Heart Problem</option>
+        <option value="Diabetes">Diabetes</option>
+    </select>
+
+    <select id="sortAge" onchange="applyPatientFilters()">
+        <option value="">Sort by Age</option>
+        <option value="asc">Age ↑</option>
+        <option value="desc">Age ↓</option>
+    </select>
+
+</div>
+
+</div>
+<h2>Patient List</h2>
+<table id="patientTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Disease</th>
+            <th>Contact</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+function addPatient() {
+    let url = "http://127.0.0.1:5000/patients";
+    let method = "POST";
+
+    if (window.currentEditId) {
+        url += "/" + window.currentEditId;
+        method = "PUT";
+    }
+
+    fetch(url, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: document.getElementById("name").value,
+            age: document.getElementById("age").value,
+            disease: document.getElementById("disease").value,
+            contact: document.getElementById("contact").value
+        })
+    })
+    .then(() => {
+        window.currentEditId = null;
+        loadPatients();
+    });
+}
+
+function loadPatients() {
+    fetch("http://127.0.0.1:5000/patients")
+    .then(res => res.json())
+    .then(data => {
+        let table = document.querySelector("#patientTable tbody");
+        table.innerHTML = "";
+
+        data.forEach(p => {
+            let row = `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>${p.age}</td>
+                    <td>${p.disease}</td>
+                    <td>${p.contact}</td>
+                    <td>
+                        <button onclick="editPatient(${p.id}, '${p.name}', ${p.age}, '${p.disease}', '${p.contact}')">Edit</button>
+                        <button onclick="deletePatient(${p.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    });
+}
+
+function editPatient(id, name, age, disease, contact) {
+    document.getElementById("name").value = name;
+    document.getElementById("age").value = age;
+    document.getElementById("disease").value = disease;
+    document.getElementById("contact").value = contact;
+
+    window.currentEditId = id;
+}
+
+function deletePatient(id) {
+    fetch(`http://127.0.0.1:5000/patients/${id}`, {
+        method: "DELETE"
+    })
+    .then(() => loadPatients());
+}
+function searchPatient() {
+    let value = document.getElementById("searchPatient").value.toLowerCase();
+    let rows = document.querySelectorAll("#patientTable tbody tr");
+
+    rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+    });
+}
+function applyPatientFilters() {
+    let searchValue = document.getElementById("searchPatient").value.toLowerCase();
+    let diseaseFilter = document.getElementById("filterDisease").value.toLowerCase();
+    let sortOrder = document.getElementById("sortAge").value;
+
+    let table = document.querySelector("#patientTable tbody");
+    let rows = Array.from(table.querySelectorAll("tr"));
+
+    // 🔍 Filter
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+
+        let matchesSearch = text.includes(searchValue);
+        let matchesDisease = diseaseFilter === "" || text.includes(diseaseFilter);
+
+        row.style.display = (matchesSearch && matchesDisease) ? "" : "none";
+    });
+
+    // 🔢 Sort
+    if (sortOrder) {
+        rows.sort((a, b) => {
+            let ageA = parseInt(a.children[1].innerText);
+            let ageB = parseInt(b.children[1].innerText);
+
+            return sortOrder === "asc" ? ageA - ageB : ageB - ageA;
+        });
+
+        // Re-append sorted rows
+        rows.forEach(row => table.appendChild(row));
+    }
+}
+loadPatients();
+</script>
+
+</body>
+</html>
