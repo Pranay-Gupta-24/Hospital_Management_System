@@ -9,6 +9,7 @@ if (localStorage.getItem("loggedIn") !== "true") {
     <title>Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -24,12 +25,53 @@ if (localStorage.getItem("loggedIn") !== "true") {
 <div class="container">
     <h1>Hospital Dashboard</h1>
 
-    <div class="cards">
-        <div class="card">Doctors: <span id="docCount"></span></div>
-        <div class="card">Patients: <span id="patCount"></span></div>
-        <div class="card">Appointments: <span id="appCount"></span></div>
-        <div class="card">Rooms: <span id="wardCount">0</span></div>
+   <div class="cards">
+
+    <div class="card">
+        <div class="card-main">
+            <i class="fa-solid fa-user-doctor icon"></i>
+            <h3>Doctors</h3>
+            <span id="docCount">1</span>
+        </div>
+        <div class="card-hover">
+            <p>Total Doctors Registered</p>
+        </div>
     </div>
+
+    <div class="card">
+        <div class="card-main">
+            <i class="fa-solid fa-user-injured icon"></i>
+            <h3>Patients</h3>
+            <span id="patCount">1</span>
+        </div>
+        <div class="card-hover">
+            <p>Total Patients</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-main">
+            <i class="fa-solid fa-calendar-check icon"></i>
+            <h3>Appointments</h3>
+            <span id="appCount">3</span>
+        </div>
+        <div class="card-hover">
+            <p>Appointments Scheduled</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-main">
+            <i class="fa-solid fa-bed icon"></i>
+            <h3>Rooms</h3>
+            <span id="wardCount">0</span>
+        </div>
+        <div class="card-hover">
+            <p>Available Rooms</p>
+        </div>
+    </div>
+
+</div>
 </div>
 <h2>Recent Appointments</h2>
 

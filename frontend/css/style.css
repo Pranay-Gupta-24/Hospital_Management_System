@@ -194,41 +194,96 @@ h1 {
 
 /* Cards Section */
 .cards {
-  display: grid;
-  justify-content: space-between;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin: 30px 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 30px 0;
 }
 
+/* CARD BASE */
 .card {
-  flex: 1;
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  transition: 0.3s;
+    position: relative;
+    height: 150px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    cursor: pointer;
 }
 
+/* MAIN CONTENT */
+.card-main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    transition: 0.4s;
+}
+
+.card-main h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #555;
+}
+
+.card-main span {
+    margin: 0;
+    font-size: 30px;
+    font-weight: bold;
+    color: #2f5bdf;
+}
+
+/* HOVER CONTENT */
+.card-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    padding: 10px;
+
+    opacity: 0;
+    transform: translateY(100%);
+    transition: 0.4s;
+}
 .card:hover {
-  transform: translateY(-5px);
+    transform: scale(1.05);
 }
 
-/* Card Text */
-.card {
-  font-size: 16px;
-  color: #555;
+/* HOVER EFFECT */
+.card:hover .card-hover {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.card span {
-  display: block;
-  font-size: 28px;
-  font-weight: bold;
-  margin-top: 8px;
-  color: #2f5dff;
+.card:hover .card-main {
+    opacity: 0;
+    transform: translateY(-100%);
 }
-
+.icon {
+    font-size: 26px;
+    color: #3a7bd5;
+    margin-bottom: 8px;
+}
+.card:hover .icon {
+    transform: scale(1.2);
+    transition: 0.3s;
+}
 /* Table Section */
 h2 {
   margin-bottom: 10px;
