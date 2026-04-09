@@ -1,3 +1,8 @@
+<script>
+if (localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "login.html";
+}
+</script>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,34 +15,38 @@
     <a href="doctors.html" class="active">👨‍⚕️ Doctors</a>
     <a href="patients.html">🧑‍🤝‍🧑 Patients</a>
     <a href="appointments.html">📅 Appointments</a>
+    <a href="login.html" class="logout-btn" onclick="logout()">🚪 Logout</a>
 </div>
 <hr>
-<h2>Add Doctor</h2>
+<h2 id="doctorTitle">Add Doctor</h2>
 
 <div class="top-bar">
-    
-    <div class="form-section">
-        <input type="text" id="name" placeholder="Name">
-        <input type="text" id="specialization" placeholder="Specialization">
-        <input type="number" id="fees" placeholder="Fees">
-        <button onclick="addDoctor()">Add Doctor</button>
+
+    <!-- ✅ ONLY FORM WRAPPED -->
+    <div id="doctorFormContainer">
+        <div class="form-section">
+            <input type="text" id="name" placeholder="Name">
+            <input type="text" id="specialization" placeholder="Specialization">
+            <input type="number" id="fees" placeholder="Fees">
+            <button id="addDoctorBtn" onclick="addDoctor()">Add Doctor</button>
+        </div>
     </div>
 
+    <!-- ✅ KEEP THIS OUTSIDE -->
     <div class="search-section">
-    
-    <div class="search-box">
-        <span class="icon">🔍</span>
-        <input type="text" id="search" placeholder="Search doctor..." onkeyup="searchDoctor()">
+        <div class="search-box">
+            <span class="icon">🔍</span>
+            <input type="text" id="search" placeholder="Search doctor...">
+        </div>
+
+        <select id="filter" onchange="filterDoctor()">
+            <option value="">All Specializations</option>
+            <option value="Cardiologist">Cardiologist</option>
+            <option value="General Physician">General Physician</option>
+        </select>
     </div>
 
-    <select id="filter" onchange="filterDoctor()">
-        <option value="">All Specializations</option>
-        <option value="Cardiologist">Cardiologist</option>
-        <option value="General Physician">General Physician</option>
-    </select>
-
-     </div>
-</div>
+</div> 
 <h2>Doctor List</h2>
 <table border="1" id="doctorTable">
     <thead>
@@ -52,6 +61,7 @@
 </table>
 
 <script>
+let role = localStorage.getItem("role");
 function addDoctor() {
     let url = "http://127.0.0.1:5000/doctors";
     let method = "POST";
@@ -84,18 +94,26 @@ function loadDoctors() {
         let table = document.querySelector("#doctorTable tbody");
         table.innerHTML = "";
 
-        data.forEach(doc => {
+        let role = localStorage.getItem("role");
+
+        data.forEach(d => {
+            let actionButtons = "";
+
+            if (role !== "guest") {
+                actionButtons = `
+                    <button onclick="editDoctor(${d.id}, '${d.name}', '${d.specialization}')">Edit</button>
+                    <button onclick="deleteDoctor(${d.id})">Delete</button>
+                `;
+            }
+
             let row = `
                 <tr>
-                    <td>${doc.name}</td>
-                    <td>${doc.specialization}</td>
-                    <td>₹${doc.fees}</td>
-                    <td>
-                        <button onclick="editDoctor(${doc.id}, '${doc.name}', '${doc.specialization}', ${doc.fees})">Edit</button>
-                        <button onclick="deleteDoctor(${doc.id})">Delete</button>
-                    </td>
+                    <td>${d.name}</td>
+                    <td>${d.specialization}</td>
+                    <td>${actionButtons}</td>
                 </tr>
             `;
+
             table.innerHTML += row;
         });
     });
@@ -134,9 +152,26 @@ function filterDoctor() {
     searchDoctor(); // reuse same logic
 }
 
+function logout() {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "login.html";
+}
+
 // Load on start
 loadDoctors();
 </script>
+<script>
+    if (localStorage.getItem("role") === "guest") {
+    document.getElementById("addDoctorBtn").style.display = "none";
+    }
+</script>
+<script>
 
+
+if (role === "guest") {
+    document.getElementById("doctorFormContainer").style.display = "none";
+    document.getElementById("doctorTitle").style.display = "none";
+}
+</script>
 </body>
 </html>

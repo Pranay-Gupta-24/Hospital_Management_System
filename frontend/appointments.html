@@ -1,3 +1,8 @@
+<script>
+if (localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "login.html";
+}
+</script>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,10 +15,11 @@
     <a href="doctors.html">👨‍⚕️ Doctors</a>
     <a href="patients.html">🧑‍🤝‍🧑 Patients</a>
     <a href="appointments.html" class="active">📅 Appointments</a>
+    <a href="login.html" class="logout-btn" onclick="logout()">🚪 Logout</a>
 </div>
 <hr>
+<div id="appointmentFormContainer">
 <h2>Book Appointment</h2>
-
 <div class="form-row">
    <select id="patient">
     <option value="">Select Patient</option>
@@ -23,11 +29,12 @@
 </select>
     <input type="date" id="date">
     <input type="time" id="time">
-    <button onclick="addAppointment()">Book</button>
+    <button id="addAppointmentBtn" onclick="addAppointment()">Book</button>
+</div>
 </div>
 
 <h2>Appointments List</h2>
-<table id="appointmentTable">
+<table border="1" id="appointmentTable">
     <thead>
         <tr>
             <th>Patient</th>
@@ -41,6 +48,7 @@
 </table>
 
 <script>
+let role = localStorage.getItem("role");
 function loadPatientsDropdown() {
     fetch("http://127.0.0.1:5000/patients")
     .then(res => res.json())
@@ -115,19 +123,28 @@ function loadAppointments() {
         let table = document.querySelector("#appointmentTable tbody");
         table.innerHTML = "";
 
+        let role = localStorage.getItem("role");
+
         data.forEach(a => {
+            let actionButtons = "";
+
+            if (role !== "guest") {
+                actionButtons = `
+                    <button onclick="editAppointment(${a.id})">Edit</button>
+                    <button onclick="deleteAppointment(${a.id})">Delete</button>
+                `;
+            }
+
             let row = `
                 <tr>
                     <td>${a.patient}</td>
                     <td>${a.doctor}</td>
                     <td>${a.date}</td>
                     <td>${a.time}</td>
-                    <td>
-                      <button onclick="editAppointment(${a.id}, '${a.date}', '${a.time}')">Edit</button>
-                      <button onclick="deleteAppointment(${a.id})">Delete</button>
-                    </td>                  
+                    <td>${actionButtons}</td>
                 </tr>
             `;
+
             table.innerHTML += row;
         });
     });
@@ -145,11 +162,23 @@ function deleteAppointment(id) {
     })
     .then(() => loadAppointments());
 }
-
+function logout() {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "login.html";
+}
 loadAppointments();
 loadPatientsDropdown();
 loadDoctorsDropdown();
 </script>
-
+<script>
+     if (localStorage.getItem("role") === "guest") {
+    document.getElementById("addAppointmentBtn").style.display = "none";
+    }
+</script>
+<script>
+    if (role === "guest") {
+    document.getElementById("appointmentFormContainer").style.display = "none";
+    }
+</script>
 </body>
 </html>

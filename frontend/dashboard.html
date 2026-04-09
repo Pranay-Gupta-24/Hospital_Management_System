@@ -1,9 +1,15 @@
+<script>
+if (localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "login.html";
+}
+</script>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -12,6 +18,7 @@
     <a href="doctors.html">👨‍⚕️ Doctors</a>
     <a href="patients.html">🧑‍🤝‍🧑 Patients</a>
     <a href="appointments.html">📅 Appointments</a>
+    <a href="login.html" class="logout-btn" onclick="logout()">🚪 Logout</a>
 </div>
 
 <div class="container">
@@ -21,10 +28,7 @@
         <div class="card">Doctors: <span id="docCount"></span></div>
         <div class="card">Patients: <span id="patCount"></span></div>
         <div class="card">Appointments: <span id="appCount"></span></div>
-        <div class="card">
-    <h3>Wards:</h3>
-    <span id="wardCount">0</span>
-</div>
+        <div class="card">Rooms: <span id="wardCount">0</span></div>
     </div>
 </div>
 <h2>Recent Appointments</h2>
@@ -40,6 +44,27 @@
     </thead>
     <tbody></tbody>
 </table>
+<div class="ward-container">
+<h2>Ward Room Status</h2>
+<div id="wardGrid" class="ward-grid"></div>
+
+<div class="legend">
+  <span class="critical"></span> Critical
+  <span class="unstable"></span> Unstable
+  <span class="stable"></span> Stable
+  <span class="empty"></span> Empty
+</div>
+</div>
+<h2>Appointments Trend</h2>
+
+<div class="chart-container">
+  <canvas id="appointmentChart"></canvas>
+</div>
+<h2>Ward Status Distribution</h2>
+
+<div class="chart-container">
+  <canvas id="wardChart" style="height:300px;"></canvas>
+</div>
 <script>
 function loadDashboard() {
     fetch("http://127.0.0.1:5000/dashboard")
@@ -66,8 +91,95 @@ function loadDashboard() {
         });
     });
 }
+function loadWardGrid() {
+  fetch("http://127.0.0.1:5000/wards")
+    .then(res => res.json())
+    .then(data => {
+      let grid = document.getElementById("wardGrid");
+      grid.innerHTML = "";
 
+      data.forEach(w => {
+        let div = document.createElement("div");
+        div.title = "Room " + w.room + " - " + w.status;
+        div.className = "room " + w.status;
+        div.innerText = w.room;
+        div.onclick = () => {alert("Room " + w.room + " is " + w.status);};
+        grid.appendChild(div);
+      });
+    });
+}
+function loadAppointmentChart() {
+  fetch("http://127.0.0.1:5000/appointments-stats")
+    .then(res => res.json())
+    .then(data => {
+
+      let labels = data.map(d => d.date);
+      let values = data.map(d => d.total);
+
+      const ctx = document.getElementById('appointmentChart');
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Appointments',
+            data: values,
+            borderWidth: 2,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true
+            }
+          }
+        }
+      });
+
+    });
+}
+function loadWardChart() {
+    fetch("http://127.0.0.1:5000/ward-stats")
+    .then(res => res.json())
+    .then(data => {
+
+        let labels = [];
+        let values = [];
+
+        data.forEach(item => {
+            labels.push(item.status);
+            values.push(item.total);
+        });
+
+        new Chart(document.getElementById("wardChart"), {
+            type: "pie",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        "#ef4444",   // red (critical)
+                        "#f59e0b",   // yellow (unstable)
+                        "#22c55e",   // green (stable)
+                        "#9ca3af"    // gray (empty)
+                    ]
+                }]
+            }
+        });
+
+    });
+}
+function logout() {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "login.html";
+}
 loadDashboard();
+loadWardGrid();
+loadAppointmentChart();
+loadWardChart();
 </script>
 
 </body>

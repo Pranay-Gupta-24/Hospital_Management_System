@@ -23,7 +23,7 @@ button:hover {
 
 li {
     margin: 10px 0;
-    background: white;
+    /*background: white;*/
     padding: 10px;
     border-radius: 5px;
 }
@@ -150,10 +150,10 @@ body {
     display: flex;
     justify-content: center;
     gap: 30px;
-    background: linear-gradient(90deg, #1e3c72, #2a5298);
-    padding: 14px;
-    border-radius: 10px;
-    margin-bottom: 25px;
+    background: linear-gradient(135deg, #2f5dff, #4facfe);
+    padding: 15px 30px;
+    border-radius: 12px;
+    margin-bottom: 20px;
 }
 
 .navbar a {
@@ -161,7 +161,7 @@ body {
     text-decoration: none;
     font-weight: 500;
     font-size: 16px;
-    padding: 6px 12px;
+    padding: 8px 15px;
     transition: 0.3s;
 }
 
@@ -178,7 +178,8 @@ body {
 /* Container */
 .container {
   width: 90%;
-  max-width: 1100px;
+  padding: 20px;
+  max-width: 1200px;
   margin: auto;
 }
 
@@ -193,19 +194,20 @@ h1 {
 
 /* Cards Section */
 .cards {
-  display: flex;
+  display: grid;
   justify-content: space-between;
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin-bottom: 30px;
+  margin: 30px 0;
 }
 
 .card {
   flex: 1;
-  background: white;
+  background: #ffffff;
   padding: 20px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   transition: 0.3s;
 }
 
@@ -224,7 +226,7 @@ h1 {
   font-size: 28px;
   font-weight: bold;
   margin-top: 8px;
-  color: #007B;
+  color: #2f5dff;
 }
 
 /* Table Section */
@@ -235,17 +237,18 @@ h2 {
 
 /* Table */
 table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 
 /* Table Header */
 th {
-  background: #0d6efd;
+  background: #2f5dff;
   color: white;
   padding: 12px;
   text-align: left;
@@ -262,7 +265,7 @@ tr:nth-child(even){
 }
 /* Hover effect */
 tr:hover {
-  background: #eef4ff;
+  background: #f9fafb;
 }
 #recentTable tr:hover {
     background-color: #f1f1f1;
@@ -347,4 +350,254 @@ select {
 .form-row select:focus {
     outline: none;
     border-color: #007BFF;
+}
+
+.ward-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.room {
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.room:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Status colors */
+.critical { background: #ef4444; }
+.unstable { background: #f59e0b; }
+.stable { background: #22c55e; }
+.empty { background: #d1d5db; color: black; }
+
+.ward-container {
+  max-width: 900px;   /* controls width */
+  margin: 40px auto;  /* centers it */
+}
+
+/* Legend */
+.legend {
+  margin-top: 15px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.legend span {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  border-radius: 50%;
+}
+
+.chart-container {
+  max-width: 600px;
+  margin: 40px auto;
+  height: 300px;   /* 🔥 THIS FIXES IT */
+}
+
+/* RESET */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* MAIN LAYOUT */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    background: linear-gradient(-45deg, #1e3c72, #2a5298, #4facfe, #00f2fe);
+    background-size: 400% 400%;
+
+    animation: gradientBG 5s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+.login-page .container {
+    display: flex;
+    width: 900px;
+    height: 500px;
+
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+/* LEFT PANEL */
+.left-panel {
+    width: 50%;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 50px;
+
+    padding: 25px;
+}
+
+.left-panel h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.left-panel p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+/* REMOVE BULLETS */
+.left-panel ul {
+    list-style: none;
+    padding: 0;
+}
+
+.left-panel li {
+    margin: 12px 0;
+    font-size: 16px;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+    width: 50%;
+    background: #f9fbfd;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* LOGIN BOX */
+.login-box {
+    width: 300px;
+    padding: 20px;
+    background: white;
+
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+    text-align: center;
+}
+
+.login-box h2 {
+    margin-bottom: 20px;
+}
+
+/* INPUTS */
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+
+    border-radius: 6px;
+    border: 1px solid #ddd;
+
+    font-size: 14px;
+    transition: 0.3s;
+}
+.login-box input:focus {
+    border-color: #4facfe;
+    box-shadow: 0 0 5px rgba(79,172,254,0.5);
+    outline: none;
+}
+
+/* BUTTON */
+.login-box button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+
+    background: #2a5298;
+    color: white;
+    border: none;
+
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* HOVER */
+.login-box button:hover {
+    background: #1e3c72;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* ERROR */
+#error {
+    color: red;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.container {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white !important;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+}
+
+
+.guest-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.guest-btn:hover {
+    background: #d1d5db;
 }

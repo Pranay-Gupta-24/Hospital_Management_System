@@ -47,13 +47,31 @@ def init_db():
     ''')
 
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS wards (
+CREATE TABLE IF NOT EXISTS wards (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    capacity INTEGER NOT NULL,
-    occupied INTEGER NOT NULL
-    );
-  ''')
+    room TEXT UNIQUE,
+    status TEXT
+)
+''')
+    sample_wards = [
+    ("401", "critical"),
+    ("402", "stable"),
+    ("403", "unstable"),
+    ("404", "empty"),
+    ("405", "critical"),
+    ("406", "empty"),
+    ("407", "unstable"),
+    ("408", "stable"),
+    ("409", "empty"),
+    ("410", "empty"),
+    ("411", "empty"),
+    ("412", "empty")
+]
+
+    cursor.executemany(
+    "INSERT INTO wards (room, status) VALUES (?, ?)",sample_wards
+    )
+             
 
     conn.commit()
     conn.close()
@@ -200,8 +218,8 @@ def dashboard():
         "doctors": doctors,
         "patients": patients,
         "appointments": appointments,
+        "wards": wards,
         "recent": [dict(r) for r in recent],
-        "wards": wards
     })
 
 #Edit Feature
@@ -247,9 +265,8 @@ def update_appointment(id):
 
     return {"message": "Appointment updated"}
 
-
-#Ward API
-@app.route('/wards', methods=['GET'])
+#Wards API
+@app.route('/wards')
 def get_wards():
     conn = get_db_connection()
     wards = conn.execute("SELECT * FROM wards").fetchall()
@@ -257,19 +274,58 @@ def get_wards():
 
     return jsonify([dict(w) for w in wards])
 
-@app.route('/wards', methods=['POST'])
-def add_ward():
-    data = request.json
-
+@app.route('/appointments-stats')
+def appointment_stats():
     conn = get_db_connection()
-    conn.execute(
-        "INSERT INTO wards (name, capacity, occupied) VALUES (?, ?, ?)",
-        (data['name'], data['capacity'], data['occupied'])
-    )
-    conn.commit()
+
+    data = conn.execute("""
+        SELECT date, COUNT(*) as total
+        FROM appointments
+        GROUP BY date
+        ORDER BY date
+    """).fetchall()
+
     conn.close()
 
-    return {"message": "Ward added"}
+    return jsonify([dict(row) for row in data])
+@app.route('/ward-stats')
+def ward_stats():
+    conn=get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT status, COUNT(*) 
+        FROM wards 
+        GROUP BY status
+    """)
+
+    data = cursor.fetchall()
+    conn.close()
+
+    result = []
+    for row in data:
+        result.append({
+            "status": row[0],
+            "total": row[1]
+        })
+
+    return jsonify(result)
+
+#Login API
+from flask import request, jsonify
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+
+    username = data.get('username')
+    password = data.get('password')
+
+    # Simple static login (for now)
+    if username == "admin" and password == "1234":
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False})    
 
 if __name__ == '__main__':
     app.run(debug=True)

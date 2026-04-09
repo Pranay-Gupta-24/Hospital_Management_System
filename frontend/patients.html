@@ -1,3 +1,8 @@
+<script>
+if (localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "login.html";
+}
+</script>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,44 +15,41 @@
     <a href="doctors.html">👨‍⚕️ Doctors</a>
     <a href="patients.html" class="active">🧑‍🤝‍🧑 Patients</a>
     <a href="appointments.html">📅 Appointments</a>
+    <a href="login.html" class="logout-btn" onclick="logout()">🚪 Logout</a>
 </div>
 <hr>
-<h2>Add Patient</h2>
+<h2 id="patientTitle">Add Patient</h2>
 
 <div class="top-bar">
 
-    <div class="form-section">
-        <input type="text" id="name" placeholder="Name">
-        <input type="number" id="age" placeholder="Age">
-        <input type="text" id="disease" placeholder="Disease">
-        <input type="text" id="contact" placeholder="Contact">
-        <button onclick="addPatient()">Add Patient</button>
+    <!-- ✅ FORM (wrapped) -->
+    <div id="patientFormContainer">
+        <div class="form-section">
+            <input type="text" id="name" placeholder="Name">
+            <input type="number" id="age" placeholder="Age">
+            <input type="text" id="disease" placeholder="Disease">
+            <input type="text" id="contact" placeholder="Contact">
+            <button id="addPatientBtn" onclick="addPatient()">Add Patient</button>
+        </div>
     </div>
 
+    <!-- ✅ SEARCH + FILTER (always visible) -->
     <div class="search-section">
+        <div class="search-box">
+            <span class="icon">🔍</span>
+            <input type="text" id="search" placeholder="Search patient...">
+        </div>
 
-    <div class="search-box">
-        <span class="icon">🔍</span>
-        <input type="text" id="searchPatient" placeholder="Search patient..." onkeyup="applyPatientFilters()">
+        <select id="filter" onchange="filterPatient()">
+            <option value="">All Diseases</option>
+            <option value="Heart Problem">Heart Problem</option>
+            <option value="Fever">Fever</option>
+        </select>
     </div>
-
-    <select id="filterDisease" onchange="applyPatientFilters()">
-        <option value="">All Diseases</option>
-        <option value="Heart Problem">Heart Problem</option>
-        <option value="Diabetes">Diabetes</option>
-    </select>
-
-    <select id="sortAge" onchange="applyPatientFilters()">
-        <option value="">Sort by Age</option>
-        <option value="asc">Age ↑</option>
-        <option value="desc">Age ↓</option>
-    </select>
-
-</div>
 
 </div>
 <h2>Patient List</h2>
-<table id="patientTable">
+<table border="1" id="patientTable">
     <thead>
         <tr>
             <th>Name</th>
@@ -61,6 +63,7 @@
 </table>
 
 <script>
+let role = localStorage.getItem("role");
 function addPatient() {
     let url = "http://127.0.0.1:5000/patients";
     let method = "POST";
@@ -95,19 +98,28 @@ function loadPatients() {
         let table = document.querySelector("#patientTable tbody");
         table.innerHTML = "";
 
+        let role = localStorage.getItem("role");
+
         data.forEach(p => {
+            let actionButtons = "";
+
+            if (role !== "guest") {
+                actionButtons = `
+                    <button onclick="editPatient(${p.id}, '${p.name}', ${p.age}, '${p.disease}', '${p.contact}')">Edit</button>
+                    <button onclick="deletePatient(${p.id})">Delete</button>
+                `;
+            }
+
             let row = `
                 <tr>
                     <td>${p.name}</td>
                     <td>${p.age}</td>
                     <td>${p.disease}</td>
                     <td>${p.contact}</td>
-                    <td>
-                        <button onclick="editPatient(${p.id}, '${p.name}', ${p.age}, '${p.disease}', '${p.contact}')">Edit</button>
-                        <button onclick="deletePatient(${p.id})">Delete</button>
-                    </td>
+                    <td>${actionButtons}</td>
                 </tr>
             `;
+
             table.innerHTML += row;
         });
     });
@@ -167,8 +179,23 @@ function applyPatientFilters() {
         rows.forEach(row => table.appendChild(row));
     }
 }
+function logout() {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "login.html";
+}
 loadPatients();
 </script>
+<script>
+     if (localStorage.getItem("role") === "guest") {
+    document.getElementById("addPatientBtn").style.display = "none";
+    }
+</script>
+<script>
 
+if (role === "guest") {
+    document.getElementById("patientFormContainer").style.display = "none";
+    document.getElementById("patientTitle").style.display = "none";
+}
+</script>
 </body>
 </html>
